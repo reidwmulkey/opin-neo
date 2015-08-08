@@ -47,6 +47,7 @@ Creating nodes
 Batch creation
 ----------------
 Each promise will execute in a promise.all() asynchronous fashion
+
 	db.all([
 		db.createNode(["Oolong", "Tea"], {name:"Low oxidation Oolong"}),
 		db.createNode(["Chai", "Tea", "Yerba Mate"], {name:"Yerba Chai"}),
@@ -63,6 +64,7 @@ Each promise will execute in a promise.all() asynchronous fashion
 Creating Relationships
 --------------
 If passed integers, it will use the uuid of a transaction array index. If passed strings, it will use node UUIDs. 
+
 	db.createRel(fromId, toId, Labels, relObject).then(function(relationship){
 		console.log(relationship.from); //logs the from node
 		console.log(relationship.to); 	//logs the to node
@@ -71,7 +73,8 @@ If passed integers, it will use the uuid of a transaction array index. If passed
 
 Transactions
 -----------------------
-Each promise will resolve synchronously, so that data from one can be used by a following promise
+Each promise will resolve synchronously, so that data from one can be used by a following promise.
+
 	db.tx([
 		db.createNode("Store", {name:"Avoca Coffee Shop"}),
 		db.createNode(["Chai", "Tea", "Yerba Mate"], {name:"Yerba Chai"}),
