@@ -4,7 +4,9 @@ Background
 After about half a year of developing express neo4j applications, I have had several takeaways about developing graph database applications, and have had several frustrations with the current express adapters to the neo4j rest interface. 
 
 -Most are not promise driven, an importance that shouldn't even need to be stressed.
+
 -They  have functions that depend on the neo4j node id's. These id's are assigned with volatility, So should not be used for any queries.
+
 -Transactions are unsupported.
 
 Because of these reasons, development boiled down to just running pre-written queries, which has worked very well, but in order for neo4j express applications to get anywhere close to the point of MEAN applications, we're going to need a much more intuitive way of accessing our data.
