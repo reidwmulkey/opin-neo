@@ -1,0 +1,35 @@
+{
+  "name": "opin-neo",
+  "version": "0.0.0",
+  "description": "An open-source opinionated neo4j adapter for expressJS web applications",
+  "main": "opin-neo.js",
+  "scripts": {
+    "test": "./node_modules/.bin/mocha test"
+  },
+  "dependencies": {
+    "node-uuid": "^1.4.3",
+    "q": "^1.4.1",
+    "request": "^2.60.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "assert": "^1.3.0",
+    "mocha": "^2.2.5"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reidwmulkey/opin-neo.git"
+  },
+  "keywords": [
+    "expressJS",
+    "neo4j",
+    "graph",
+    "database"
+  ],
+  "author": "reidwmulkey",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reidwmulkey/opin-neo/issues"
+  },
+  "homepage": "https://github.com/reidwmulkey/opin-neo#readme"
+}

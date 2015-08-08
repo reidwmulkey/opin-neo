@@ -24,6 +24,8 @@ Being an opinionated adapter, this program will run off a couple assumptions for
 
 -Labels should be used extensively throughout the application, due to auto-indexing. For writing a generic query, a label of null will apply to all nodes. Passing an array of labels will instead query with each of those labels applied.
 
+-Unit testing isn't entirely there yet for neo4j unfortunately. To get around this, all nodes and relationships created under test mode will be deleted when test mode is disabled.
+
 Usage
 ===============
 
@@ -126,3 +128,19 @@ Deleting information
 	db.deleteRels(fromId, toId, Labels).then(function(){
 		//resolves with no parameters
 	})	
+
+Test Mode
+============
+In order to perform unit tests, you must first enable testing mode.
+
+	db.startTests().then(function(){
+		//nodes and relationships created will be deleted when test mode is stopped
+	});
+
+Testing mode will keep track of all nodes and relationships created, and this information will be deleted when you stop testing mode.
+
+	db.stopTests().then(function(){
+		//nodes and relationships created while in testing mode are all deleted
+	});
+
+Due to security/"Woops, there goes the whole database" concerns, test mode will eventually be removed from the main branch forked off into its own project.
