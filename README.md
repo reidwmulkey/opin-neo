@@ -1,15 +1,15 @@
 Background
 ==============
 
-After about half a year of developing express neo4j applications, I have had several takeaways about developing graph database applications, and have had several frustrations with the current express adapters to the neo4j rest interface. 
+In developing neo4j applications, I have had several frustrations with the current express adapters in existence. 
 
--Most are not promise driven, an importance that shouldn't even need to be stressed.
+-Most are not promise driven - an importance that shouldn't even need to be stressed.
 
 -They  have functions that depend on the neo4j node id's. These id's are assigned with volatility, So should not be used for any queries.
 
 -Transactions are unsupported.
 
-Because of these reasons, development boiled down to just running pre-written queries, which has worked very well, but in order for neo4j express applications to get anywhere close to the point of MEAN applications, we're going to need a much more intuitive way of accessing our data.
+Because of these reasons, development on my team boiled down to just running pre-written queries, which has worked very well, but in order for neo4j express applications to get anywhere close to the point of MEAN applications, we're going to need a much more intuitive way of accessing our data.
 
 Assumptions
 ==============
@@ -37,14 +37,19 @@ In main.js/app.js, first initialize the adapter with the URL of your neo4j rest 
 	var db = require('opin-neo');
 	db.setup("http://127.0.0.1:7474/db/data/");
 	//in order to authenticate:
-	db.setup("http://bob:iAmABadAdmin@127.0.0.1:7474/db/data/");
+	db.setup("http://bob:iAmABadAdmin@127.0.0.1:7474/db/data/")
+	.then(function(){
+
+	});
 	...
 
 Creating nodes
 ---------------
 	//nodeObject: JSON object with the properties to store for the node
-	//Labels: either null, a string, or an array of strings which should be applied as labels
-	db.createNode(Labels, nodeObject).then(function(node){
+	//labels: either null, a string, or an array of strings which should be applied as labels
+	db.run(
+		db.createNode(labels, nodeObject)
+	).then(function(node){
 		//returns the node object created, with a generated .uuid property if one was not provided
 	})
 
@@ -52,7 +57,7 @@ Batch creation
 ----------------
 Each promise will execute in a promise.all() asynchronous fashion
 
-	db.all([
+	db.run([
 		db.createNode(["Oolong", "Tea"], {name:"Low oxidation Oolong"}),
 		db.createNode(["Chai", "Tea", "Yerba Mate"], {name:"Yerba Chai"}),
 		db.createNode("Store", {name:"Avoca Coffee Shop"}),
@@ -68,8 +73,9 @@ Each promise will execute in a promise.all() asynchronous fashion
 Creating Relationships
 --------------
 If passed integers, it will use the uuid of a transaction array index. If passed strings, it will use node UUIDs. 
-
-	db.createRel(fromId, toId, Labels, relObject).then(function(relationship){
+	db.run(
+		db.createRel(fromId, toId, Labels, relObject)
+	).then(function(relationship){
 		console.log(relationship.from); //logs the from node
 		console.log(relationship.to); 	//logs the to node
 		console.log(relationship.data);	//logs the relationship properties
@@ -91,41 +97,59 @@ Each promise will resolve synchronously, so that data from one can be used by a 
 
 Finding nodes
 --------------
-	db.getNode(uuid).then(function(node){
+	db.run(
+		db.getNode(uuid)
+	).then(function(node){
 
 	})
 
 	//search object is a JSON object with properties you are looking for. Supports the cypher regular expressions
-	db.searchNodes(Labels, searchObject).then(function(nodes){
+	db.run(
+		db.searchNodes(Labels, searchObject)
+	).then(function(nodes){
 
 	})
 
 	//can also use collection searching in the searchObject, e.g.,
-	db.searchNodes("Tea", {
-		name: ["Yerba Chai", "Low oxidation Oolong", "Some other name"]
-	}).then(function(nodes){
+	db.run(
+		db.searchNodes("Tea", {
+			name: ["Yerba Chai", "Low oxidation Oolong", "Some other name"]
+		})
+	).then(function(nodes){
 
 	});
 
-	db.findRels(fromId, toId, Labels, searchObject).then(function(rels){
+	db.run(
+		db.findRels(fromId, toId, Labels, searchObject)
+	).then(function(rels){
 
 	})
 
 Updating information
 --------------------
-	db.setNode(uuid, nodeObject).then(function(node){
+	db.run(
+		db.setNode(uuid, nodeObject)
+	).then(function(node){
+	
 	})
 
-	db.setRel(fromId, toId, Labels, relObject).then(function(rel){
+	db.run(
+		db.setRel(fromId, toId, Labels, relObject)
+	).then(function(rel){
+	
 	})	
 
 Deleting information
 --------------------
-	db.deleteNode(uuid).then(function(){
+	db.run(
+		db.deleteNode(uuid)
+	).then(function(){
 		//resolves with no parameters	
 	})
 
-	db.deleteRels(fromId, toId, Labels).then(function(){
+	db.run(
+		db.deleteRels(fromId, toId, Labels)
+	).then(function(){
 		//resolves with no parameters
 	})	
 

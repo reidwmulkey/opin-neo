@@ -47,16 +47,67 @@ module.exports.setup = function(url){
 /////////////////////////////////////////////
 // tx() function
 /////////////////////////////////////////////
-module.exports.tx = function(queries){
+module.exports.tx = function(queryObjects){
 	var deferred = q.defer();
-	deferred.reject('un-implemented');
+
+	var statements = [];
+	if(queryObjects && !(queryObjects instanceof Array)){
+		var tempQuery = queryObjects;
+		queryObjects = [tempQuery];
+	}
+	var nodeInc = 0;
+	_.each(queryObjects, function(statement) {
+		if(statement != ""){
+			while(statement.statement.indexOf("%n%") > -1){
+				statement.statement = statement.statement.replace(/%n%/, 'n' + nodeInc);
+				nodeInc++;
+			}
+			var retString = ' RETURN ';
+			if(nodeInc > 0){
+				retString += "n0";
+				for(var i = 1; i < nodeInc; i++){
+					retString += ", n" + i;
+				}
+				retString += ";";	
+			}
+			statement.statement += retString;
+			statements.push({
+				statement: statement.statement,
+				parameters: statement.parameters,
+				resultDataContents: ["graph"]
+			});
+		}
+	});
+	if(statements.length > 0){
+		var reqData = {
+			statements: statements
+		};
+		console.log(reqData);
+		request({
+			method: "POST",
+			uri: serverURL + "transaction/commit",
+			body: reqData,
+			json: true
+		}, function(error, response, body){
+			console.log(response.statusCode);
+			// var jsonBody = JSON.parse(body);
+			console.log(body.results[0].data[0].graph.nodes);
+		});
+
+	} else {
+		deferred.reject({
+			statusCode: 400,
+			error: "No statements received in tx()"
+		});
+	}
+	
 	return deferred.promise;
 }
 
 /////////////////////////////////////////////
 // all() function
 /////////////////////////////////////////////
-module.exports.all = function(queries){
+module.exports.run = function(queryObjects){
 	var deferred = q.defer();
 	deferred.reject('un-implemented');
 	return deferred.promise;
@@ -67,10 +118,24 @@ module.exports.all = function(queries){
 // creating data functions
 /////////////////////////////////////////////
 module.exports.createNode = function(labels, nodeObject){
-	var deferred = q.defer();
-	deferred.reject('un-implemented');
-	return deferred.promise;
-}
+	if(!nodeObject) return "";
+	if(nodeObject && !nodeObject.uuid)
+		nodeObject.uuid = uuid.v1();
+	var labelString = "";
+	if(labels){
+		if(!(labels instanceof Array)){
+			var tempLabel = labels;
+			labels = [tempLabel];
+		}
+		_.each(labels, function(label){
+			labelString += ":" + label;
+		});
+	}
+	return {
+		statement: "CREATE (%n%" + labelString + " {params})",
+		parameters: {params: nodeObject}
+	};
+};
 
 module.exports.createRel = function(fromId, toId, labels, relObject){
 	var deferred = q.defer();
